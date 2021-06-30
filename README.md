@@ -40,7 +40,7 @@ public struct Bar {
     public int foobar;
 }
 ```
-1. build (you need [option](https://github.com/codeRiftel/option) and [vjp](https://github.com/codeRiftel/vjp), just put option/ dir from the option package into root of this project as well as VJP.cs from vjp package)
+1. build (you need [option](https://github.com/codeRiftel/option) and [vjp](https://github.com/codeRiftel/vjp), just put option/ dir from the option package into root of this project as well as VJP.cs from vjp package)  
 `make`
 2. run  
 `cat *cs | mono xtractor.exe > description.json`
