@@ -6,7 +6,7 @@ X
 ```csharp
 using System.Collections.Generic;
 
-// vjp.xtract
+// vjp.xtract <-- put this above class/struct
 public struct Person {
     public string name;
     public int age;
@@ -40,7 +40,8 @@ public struct Bar {
     public int foobar;
 }
 ```
-1. build  
+1. build (you need [option](https://github.com/codeRiftel/option) and [vjp](https://github.com/codeRiftel/vjp), just put option/ dir from the option package into root of this project as well as VJP.cs from vjp package)
 `make`
 2. run  
 `cat *cs | mono xtractor.exe > description.json`
+3. now you can use [meta-vjp](https://github.com/codeRiftel/meta-vjp) with description.json to generate C# code for parsing/generating JSON
