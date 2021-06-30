@@ -3,7 +3,7 @@ X
 
 ## How to xtract?
 0. mark your classes/structs by comment above declaration  
-```javascript
+```csharp
 using System.Collections.Generic;
 
 // vjp.xtract
