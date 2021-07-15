@@ -54,6 +54,8 @@ public static class X {
         int pos = 0;
         int opened = 0;
 
+        var slaves = new List<JSONType>();
+
         while (lexRes.token != Token.EOF) {
             lexRes = Lex(source, pos);
             if (lexRes.token == Token.Unknown) {
@@ -160,6 +162,12 @@ public static class X {
                             type = fullTypeBuilder.ToString();
                         } else if (nextTokenRes.token == Token.Word) {
                             type = source.Substring(typeRes.start, typeRes.len);
+                            if (type.EndsWith("[]")) {
+                                var subtype = type.Substring(0, type.Length - 2);
+                                if (IsPrimitive(subtype)) {
+                                    slaves.Add(JSONType.Make(subtype));
+                                }
+                            }
                         }
 
                         var nameRes = Lex(source, field);
@@ -186,6 +194,10 @@ public static class X {
                     state = ParseState.OutType;
                 }
             }
+        }
+
+        if (slaves.Count > 0) {
+            root["__slaves"] = JSONType.Make(slaves);
         }
 
         return Result<JSONType, Tracterr>.Ok(JSONType.Make(root));
@@ -370,5 +382,12 @@ public static class X {
 
     private static bool IsWhiteSpace(char c) {
         return c == ' ' || c == '\t' || c == '\n';
+    }
+
+    private static bool IsPrimitive(string type) {
+        return type == "string" || type == "int" || type == "float" || type == "double" ||
+            type == "decimal" || type == "sbyte" || type == "byte" || type == "short" ||
+            type == "ushort" || type == "uint" || type == "long" || type == "ulong" ||
+            type == "bool";
     }
 }
