@@ -69,7 +69,7 @@ public static class X {
                     var comment = source.Substring(lexRes.start, lexRes.len);
                     var dec = lexRes.start + lexRes.len;
                     lexRes = Lex(source, dec);
-                    if (lexRes.token == Token.Word && comment.Contains("vjp.xtract")) {
+                    if (lexRes.token == Token.Word && comment.Contains("jonson.xtract")) {
                         var mod = source.Substring(lexRes.start, lexRes.len).Trim();
                         dec = lexRes.start + lexRes.len;
                         var typeRes = Lex(source, dec);
