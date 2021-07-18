@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using vjp;
+using jonson;
 
 class Init {
     private static int Main(string[] args) {
@@ -20,7 +20,7 @@ class Init {
             var err = res.AsErr();
             Console.WriteLine("ERROR: " + err);
         } else {
-            Console.WriteLine(VJP.GeneratePretty(res.AsOk()));
+            Console.WriteLine(Jonson.GeneratePretty(res.AsOk()));
         }
 
         return 0;
