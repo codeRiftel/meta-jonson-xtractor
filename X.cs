@@ -22,6 +22,8 @@ public static class X {
         CloseAngle,
         Comma,
         LineComment,
+        BlockComment,
+        Division,
         EOF
     }
 
@@ -291,6 +293,41 @@ public static class X {
                             res.len = pos - startComment;
                             res.token = Token.LineComment;
                         }
+                    } else if (c == '*') {
+                        while (true) {
+                            nextComChar = NextChar(source, ref pos);
+                            if (nextComChar.IsNone()) {
+                                res.token = Token.EOF;
+                                break;
+                            } else {
+                                c = nextComChar.Peel();
+
+                                if (c == '*') {
+                                    var tempPos = pos;
+                                    nextComChar = NextChar(source, ref tempPos);
+                                    if (nextComChar.IsNone()) {
+                                        res.token = Token.EOF;
+                                        break;
+                                    } else {
+                                        var maybeSlash = nextComChar.Peel();
+                                        if (maybeSlash == '/') {
+                                            pos = tempPos;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (res.token != Token.EOF) {
+                            res.start = startComment;
+                            res.len = pos - startComment;
+                            res.token = Token.BlockComment;
+                        }
+                    } else {
+                        res.start = startComment;
+                        res.len = 1;
+                        res.token = Token.Division;
                     }
                 }
                 break;
