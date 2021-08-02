@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-// vjp.xtract
+// jonson.xtract
 public struct Person {
     public string name;
     public int age;
@@ -21,14 +21,14 @@ public enum Number {
     Three,
 }
 
-// vjp.xtract
+// jonson.xtract
 public class Job {
     public string name;
     public string position;
     public decimal salary;
 }
 
-// vjp.xtract
+// jonson.xtract
 public struct Bar {
     public string foo;
     public int foobar;
