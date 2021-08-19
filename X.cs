@@ -59,11 +59,11 @@ public static class X {
         int pos = 0;
         int opened = 0;
 
-        var slaves = new List<JSONType>();
+        var slaves = new HashSet<string>();
 
         var enumSet = LookUpEnums(source);
         if (enumSet.Count > 0) {
-            slaves.Add(JSONType.Make("int"));
+            slaves.Add("int");
         }
 
         while (lexRes.token != Token.EOF) {
@@ -203,7 +203,7 @@ public static class X {
                             if (type.EndsWith("[]")) {
                                 var subtype = type.Substring(0, type.Length - 2);
                                 if (IsPrimitive(subtype)) {
-                                    slaves.Add(JSONType.Make(subtype));
+                                    slaves.Add(subtype);
                                 }
                             }
                         }
@@ -235,7 +235,12 @@ public static class X {
         }
 
         if (slaves.Count > 0) {
-            root["__slaves"] = JSONType.Make(slaves);
+            var slaveTypes = new List<JSONType>();
+            foreach (var slave in slaves) {
+                slaveTypes.Add(JSONType.Make(slave));
+            }
+
+            root["__slaves"] = JSONType.Make(slaveTypes);
         }
 
         return Result<JSONType, Tracterr>.Ok(JSONType.Make(root));
