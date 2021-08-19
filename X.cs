@@ -175,13 +175,16 @@ public static class X {
                                     fullBuilder.Append(genInfo.name);
                                     fullBuilder.Append('<');
 
-                                    if (genInfo.types.Count > 0) {
-                                        fullBuilder.Append(genInfo.types[0]);
-                                    }
+                                    for (int i = 0; i < genInfo.types.Count; i++) {
+                                        if (i > 0) {
+                                            fullBuilder.Append(", ");
+                                        }
+                                        var subtype = genInfo.types[i];
+                                        fullBuilder.Append(subtype);
 
-                                    for (int i = 1; i < genInfo.types.Count; i++) {
-                                        fullBuilder.Append(", ");
-                                        fullBuilder.Append(genInfo.types[i]);
+                                        if (IsPrimitive(subtype) || IsCollection(subtype)) {
+                                            slaves.Add(subtype);
+                                        }
                                     }
 
                                     fullBuilder.Append('>');
@@ -460,6 +463,10 @@ public static class X {
 
     private static bool IsWhiteSpace(char c) {
         return c == ' ' || c == '\t' || c == '\n';
+    }
+
+    private static bool IsCollection(string type) {
+        return type.StartsWith("Dictionary<") || type.StartsWith("List<");
     }
 
     private static bool IsPrimitive(string type) {
