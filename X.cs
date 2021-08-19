@@ -47,8 +47,6 @@ public static class X {
             return Result<JSONType, Tracterr>.Err(Tracterr.EmptySource);
         }
 
-        var enumSet = LookUpEnums(source);
-
         var root = new Dictionary<string, JSONType>();
         Dictionary<string, JSONType> current = null;
         var state = ParseState.OutType;
@@ -57,6 +55,11 @@ public static class X {
         int opened = 0;
 
         var slaves = new List<JSONType>();
+
+        var enumSet = LookUpEnums(source);
+        if (enumSet.Count > 0) {
+            slaves.Add(JSONType.Make("int"));
+        }
 
         while (lexRes.token != Token.EOF) {
             lexRes = Lex(source, pos);
