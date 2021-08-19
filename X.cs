@@ -38,6 +38,11 @@ public static class X {
         InType
     }
 
+    private struct GenInfo {
+        public string name;
+        public List<string> types;
+    }
+
     public static Result<JSONType, Tracterr> Tract(string source) {
         if (source == null) {
             return Result<JSONType, Tracterr>.Err(Tracterr.NullSource);
@@ -132,39 +137,67 @@ public static class X {
                         field = typeRes.start + typeRes.len;
                         var nextTokenRes = Lex(source, field);
 
+                        var full = new Stack<GenInfo>();
+
                         if (nextTokenRes.token == Token.OpenAngle) {
-                            var genericTypes = new List<string>(2);
+                            full.Push(
+                                new GenInfo {
+                                    name = source.Substring(typeRes.start, typeRes.len),
+                                    types = new List<string>()
+                                }
+                            );
+
+                            field = nextTokenRes.start + nextTokenRes.len;
+
                             while (true) {
                                 nextTokenRes = Lex(source, field);
 
-                                var isEnd = nextTokenRes.token == Token.CloseAngle;
-                                isEnd = isEnd || nextTokenRes.token == Token.EOF;
-                                if (isEnd) {
+                                if (nextTokenRes.token == Token.EOF) {
                                     break;
                                 } else if (nextTokenRes.token == Token.Word) {
-                                    var startGenType = nextTokenRes.start;
-                                    var startGenLen = nextTokenRes.len;
-                                    genericTypes.Add(source.Substring(startGenType, startGenLen));
+                                    var startWord = nextTokenRes.start;
+                                    var lenWord = nextTokenRes.len;
+                                    var genWord = source.Substring(startWord, lenWord);
+                                    full.Peek().types.Add(genWord);
+                                } else if (nextTokenRes.token == Token.OpenAngle) {
+                                    var types = full.Peek().types;
+                                    var lastWord = types[types.Count - 1];
+                                    full.Peek().types.RemoveAt(types.Count - 1);
+                                    full.Push(
+                                        new GenInfo {
+                                            name = lastWord,
+                                            types = new List<string>()
+                                        }
+                                    );
+                                } else if (nextTokenRes.token == Token.CloseAngle) {
+                                    var fullBuilder = new StringBuilder();
+                                    var genInfo = full.Pop();
+                                    fullBuilder.Append(genInfo.name);
+                                    fullBuilder.Append('<');
+
+                                    if (genInfo.types.Count > 0) {
+                                        fullBuilder.Append(genInfo.types[0]);
+                                    }
+
+                                    for (int i = 1; i < genInfo.types.Count; i++) {
+                                        fullBuilder.Append(", ");
+                                        fullBuilder.Append(genInfo.types[i]);
+                                    }
+
+                                    fullBuilder.Append('>');
+
+                                    if (full.Count > 0) {
+                                        full.Peek().types.Add(fullBuilder.ToString());
+                                    } else {
+                                        type = fullBuilder.ToString();
+                                        break;
+                                    }
                                 }
 
                                 field = nextTokenRes.start + nextTokenRes.len;
                             }
 
                             field = nextTokenRes.start + nextTokenRes.len;
-
-                            var fullTypeBuilder = new StringBuilder();
-                            type = source.Substring(typeRes.start, typeRes.len);
-                            fullTypeBuilder.Append(type);
-                            fullTypeBuilder.Append('<');
-                            for (int i = 0; i < genericTypes.Count; i++) {
-                                fullTypeBuilder.Append(genericTypes[i]);
-                                if (i < genericTypes.Count - 1) {
-                                    fullTypeBuilder.Append(", ");
-                                }
-                            }
-                            fullTypeBuilder.Append('>');
-
-                            type = fullTypeBuilder.ToString();
                         } else if (nextTokenRes.token == Token.Word) {
                             type = source.Substring(typeRes.start, typeRes.len);
                             if (type.EndsWith("[]")) {
